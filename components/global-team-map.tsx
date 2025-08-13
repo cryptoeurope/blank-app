@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { MapPin, Users, Calendar, Globe, Zap, Activity } from "lucide-react"
+import { MapPin, Users, Zap } from "lucide-react"
 import Image from "next/image"
 
 interface TeamMember {
@@ -97,15 +97,14 @@ const MapMarker = ({ member, isActive, onClick, animationDelay, continentColor }
 
 export default function GlobalTeamMap() {
   const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null)
-  const [mapStyle, setMapStyle] = useState<"holographic" | "topographic">("topographic")
-  const [currentYear, setCurrentYear] = useState(2025)
+  const currentYear = 2025
   const [hoveredContinent, setHoveredContinent] = useState<string | null>(null)
 
   const teamMembers: TeamMember[] = [
     {
       id: "ripley",
-      name: "Ripley",
-      role: "Co-Founder, CEO and Chief Investment Officer",
+      name: "Ripley Donavan",
+      role: "Co-Founder, CEO & CIO",
       location: "Copenhagen, Denmark",
       country: "Denmark",
       continent: "Europe",
@@ -115,32 +114,20 @@ export default function GlobalTeamMap() {
       joinedYear: 2023,
     },
     {
-      id: "alex",
-      name: "Alex",
-      role: "Chief Strategy Officer and Head of Investor Relations",
-      location: "Paris, France",
-      country: "France",
+      id: "kresimir",
+      name: "Kresimir Rudic",
+      role: "CFO",
+      location: "Berlin, Germany",
+      country: "Germany",
       continent: "Europe",
-      coordinates: [48.8566, 2.3522],
-      bio: "Driving strategic partnerships and investor relations from Paris.",
-      flag: "🇫🇷",
-      joinedYear: 2023,
-    },
-    {
-      id: "placid",
-      name: "Placid",
-      role: "Lead Quantitative Analyst",
-      location: "Mumbai, India",
-      country: "India",
-      continent: "Asia",
-      coordinates: [19.076, 72.8777],
-      bio: "Leading quantitative research and algorithm development from Mumbai.",
-      flag: "🇮🇳",
+      coordinates: [52.52, 13.405],
+      bio: "Managing financial operations and strategic planning from Berlin.",
+      flag: "🇩🇪",
       joinedYear: 2023,
     },
     {
       id: "florian",
-      name: "Florian",
+      name: "Florian Eberl",
       role: "Signal Specialist",
       location: "Berlin, Germany",
       country: "Germany",
@@ -151,75 +138,111 @@ export default function GlobalTeamMap() {
       joinedYear: 2023,
     },
     {
+      id: "alex",
+      name: "Alex Coppel",
+      role: "Partner & Advisor",
+      location: "Paris, France",
+      country: "France",
+      continent: "Europe",
+      coordinates: [48.8566, 2.3522],
+      bio: "Providing strategic partnerships and advisory services from Paris.",
+      flag: "🇫🇷",
+      joinedYear: 2023,
+    },
+    {
+      id: "steven",
+      name: "Steven",
+      role: "Partner & Advisor",
+      location: "London, United Kingdom",
+      country: "United Kingdom",
+      continent: "Europe",
+      coordinates: [51.5074, -0.1278],
+      bio: "Strategic advisor and partner based in London.",
+      flag: "🇬🇧",
+      joinedYear: 2023,
+    },
+    {
+      id: "tosin",
+      name: "Tosin Komolafe",
+      role: "Advisor",
+      location: "Lagos, Nigeria",
+      country: "Nigeria",
+      continent: "Africa",
+      coordinates: [6.5244, 3.3792],
+      bio: "Leading our expansion into African markets from Lagos.",
+      flag: "🇳🇬",
+      joinedYear: 2024,
+    },
+    {
       id: "davide",
-      name: "Davide",
-      role: "Advisor (Hedge Fund, Broker, Trading Strategy)",
+      name: "Davide Franchioni",
+      role: "Advisor",
       location: "Milan, Italy",
       country: "Italy",
       continent: "Europe",
       coordinates: [45.4642, 9.19],
-      bio: "Providing strategic guidance on hedge fund operations and trading.",
+      bio: "Providing strategic guidance on hedge fund operations and trading from Milan.",
       flag: "🇮🇹",
       joinedYear: 2023,
     },
     {
-      id: "vitalii",
-      name: "Vitalii",
-      role: "Quantitative Analyst",
-      location: "Kyiv, Ukraine",
-      country: "Ukraine",
-      continent: "Europe",
-      coordinates: [50.4501, 30.5234],
-      bio: "Specializing in advanced statistical modeling and risk analysis.",
-      flag: "🇺🇦",
-      joinedYear: 2024,
-    },
-    {
-      id: "tosin",
-      name: "Tosin",
-      role: "Advisor (Investments, Arbitrage, Prop Firms)",
-      location: "Dubai, UAE",
-      country: "UAE",
-      continent: "Middle East",
-      coordinates: [25.2048, 55.2708],
-      bio: "Leading our expansion into Middle Eastern and African markets.",
-      flag: "🇦🇪",
-      joinedYear: 2024,
-    },
-    {
       id: "leonardo",
-      name: "Leonardo",
+      name: "Leonardo Fisichella",
       role: "Arbitrage Specialist",
       location: "Rome, Italy",
       country: "Italy",
       continent: "Europe",
       coordinates: [41.9028, 12.4964],
-      bio: "Developing arbitrage strategies and European market operations.",
+      bio: "Developing arbitrage strategies and European market operations from Rome.",
       flag: "🇮🇹",
       joinedYear: 2024,
     },
     {
+      id: "placid",
+      name: "Placid Rodrigues",
+      role: "Lead Quantitative Analyst",
+      location: "Mumbai, India",
+      country: "India",
+      continent: "Asia",
+      coordinates: [19.076, 72.8777],
+      bio: "Leading quantitative research and algorithm development from Mumbai.",
+      flag: "🇮🇳",
+      joinedYear: 2023,
+    },
+    {
+      id: "vitalii",
+      name: "Vitalii Petrushynskyi",
+      role: "Quantitative Analyst",
+      location: "Kyiv, Ukraine",
+      country: "Ukraine",
+      continent: "Europe",
+      coordinates: [50.4501, 30.5234],
+      bio: "Specializing in advanced statistical modeling and risk analysis from Kyiv.",
+      flag: "🇺🇦",
+      joinedYear: 2024,
+    },
+    {
       id: "boris",
-      name: "Boris",
+      name: "Boris Toffohossou",
       role: "Proprietary Trading Technology",
-      location: "Cape Town, South Africa",
-      country: "South Africa",
+      location: "Cotonou, Benin",
+      country: "Benin",
       continent: "Africa",
-      coordinates: [-33.9249, 18.4241],
-      bio: "Building cutting-edge trading technology from Cape Town.",
-      flag: "🇿🇦",
+      coordinates: [6.3703, 2.3912],
+      bio: "Building cutting-edge trading technology from Cotonou.",
+      flag: "🇧🇯",
       joinedYear: 2024,
     },
     {
       id: "james",
-      name: "James",
+      name: "James Didier",
       role: "Development Manager",
-      location: "Cairo, Egypt",
-      country: "Egypt",
+      location: "Lomé, Togo",
+      country: "Togo",
       continent: "Africa",
-      coordinates: [30.0444, 31.2357],
-      bio: "Managing development operations across African markets.",
-      flag: "🇪🇬",
+      coordinates: [6.1319, 1.2228],
+      bio: "Managing development operations across African markets from Lomé.",
+      flag: "🇹🇬",
       joinedYear: 2025,
     },
   ]
@@ -228,14 +251,12 @@ export default function GlobalTeamMap() {
     Europe: "#8B5CF6", // Purple
     Asia: "#10B981", // Green
     Africa: "#F97316", // Orange
-    "Middle East": "#EC4899", // Magenta
   }
 
   const continentIcons = {
     Europe: "🏛️",
     Asia: "🏯",
     Africa: "🦁",
-    "Middle East": "🕌",
   }
 
   const continentStats = teamMembers.reduce(
@@ -256,81 +277,9 @@ export default function GlobalTeamMap() {
       <div className="container mx-auto px-4 relative z-10">
         <div className="text-center mb-8">
           <h2 className="text-5xl font-bold mb-4 bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent">
-            GLOBAL TEAM EXPANSION
+            ALRI Global Team Map
           </h2>
           <div className="w-24 h-1 bg-gradient-to-r from-cyan-400 to-purple-600 mx-auto mb-6 rounded-full"></div>
-        </div>
-
-        {/* Command Center Control Bar */}
-        <div className="flex justify-center mb-8">
-          <div
-            className="bg-black/50 backdrop-blur-xl rounded-2xl p-4 border border-cyan-500/30 shadow-2xl"
-            style={{ boxShadow: "0 0 30px rgba(6, 182, 212, 0.15)" }}
-          >
-            <div className="flex items-center gap-8">
-              {/* Title */}
-              <div className="flex items-center gap-3">
-                <Globe className="w-6 h-6 text-cyan-400" />
-                <span className="text-cyan-400 font-bold text-xl">Command Center</span>
-              </div>
-
-              {/* Map Style Toggle */}
-              <div className="flex items-center gap-3">
-                <span className="text-gray-300 text-sm font-medium">Map Style:</span>
-                <div className="flex gap-1 bg-gray-800/50 rounded-lg p-1">
-                  <button
-                    onClick={() => setMapStyle("holographic")}
-                    className={`px-4 py-2 rounded-md text-sm font-semibold transition-all ${
-                      mapStyle === "holographic"
-                        ? "bg-cyan-500 text-black shadow-lg"
-                        : "text-gray-400 hover:text-gray-200"
-                    }`}
-                  >
-                    Holographic
-                  </button>
-                  <button
-                    onClick={() => setMapStyle("topographic")}
-                    className={`px-4 py-2 rounded-md text-sm font-semibold transition-all ${
-                      mapStyle === "topographic"
-                        ? "bg-cyan-500 text-black shadow-lg"
-                        : "text-gray-400 hover:text-gray-200"
-                    }`}
-                  >
-                    Topographic
-                  </button>
-                </div>
-              </div>
-
-              {/* Year Slider */}
-              <div className="flex items-center gap-4">
-                <Calendar className="w-5 h-5 text-cyan-400" />
-                <span className="text-gray-300 text-sm font-medium">Year:</span>
-                <div className="relative">
-                  <input
-                    type="range"
-                    min="2023"
-                    max="2025"
-                    value={currentYear}
-                    onChange={(e) => setCurrentYear(Number.parseInt(e.target.value))}
-                    className="w-24 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
-                    style={{
-                      background: `linear-gradient(to right, #06b6d4 0%, #06b6d4 ${((currentYear - 2023) / 2) * 100}%, #374151 ${((currentYear - 2023) / 2) * 100}%, #374151 100%)`,
-                    }}
-                  />
-                </div>
-                <div className="bg-gradient-to-r from-cyan-400 to-blue-500 text-black px-3 py-1 rounded-lg font-bold text-sm min-w-[50px] text-center">
-                  {currentYear}
-                </div>
-              </div>
-
-              {/* Status Indicator */}
-              <div className="flex items-center gap-2">
-                <Activity className="w-4 h-4 text-green-400" />
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                <span className="text-green-400 text-sm font-medium">Online</span>
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* Professional 3D World Map */}
@@ -345,21 +294,11 @@ export default function GlobalTeamMap() {
                 src="/alri-blue-world-map.jpeg"
                 alt="ALRI Global Team Map"
                 fill
-                className={`object-cover transition-all duration-500 ${
-                  mapStyle === "topographic" ? "opacity-100" : "opacity-80"
-                }`}
+                className={`object-cover transition-all duration-500 opacity-100`}
                 style={{
-                  filter:
-                    mapStyle === "holographic"
-                      ? "brightness(1.1) contrast(1.3) hue-rotate(5deg) saturate(1.2)"
-                      : "brightness(1.0) contrast(1.1)",
+                  filter: "brightness(1.0) contrast(1.1)",
                 }}
               />
-
-              {/* Overlay for holographic effect */}
-              {mapStyle === "holographic" && (
-                <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/15 via-blue-400/10 to-purple-400/15 mix-blend-screen" />
-              )}
             </div>
 
             {/* Team Member Markers */}
@@ -395,18 +334,6 @@ export default function GlobalTeamMap() {
                 )
               })}
             </svg>
-
-            {/* Interactive Grid Overlay for Holographic Mode */}
-            {mapStyle === "holographic" && (
-              <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-20">
-                <defs>
-                  <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#06b6d4" strokeWidth="0.5" opacity="0.3" />
-                  </pattern>
-                </defs>
-                <rect width="100%" height="100%" fill="url(#grid)" />
-              </svg>
-            )}
           </div>
 
           {/* Selected Member Info Panel */}

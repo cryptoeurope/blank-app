@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { MapPin, Users, Globe } from "lucide-react"
+import { MapPin, Users, Calendar, Network } from "lucide-react"
 
 interface TeamMember {
   id: string
@@ -21,9 +21,10 @@ interface MapMarkerProps {
   isActive: boolean
   onClick: () => void
   animationDelay: number
+  continentColor: string
 }
 
-const MapMarker = ({ member, isActive, onClick, animationDelay }: MapMarkerProps) => {
+const MapMarker = ({ member, isActive, onClick, animationDelay, continentColor }: MapMarkerProps) => {
   const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
@@ -33,31 +34,48 @@ const MapMarker = ({ member, isActive, onClick, animationDelay }: MapMarkerProps
 
   return (
     <div
-      className={`absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer transition-all duration-500 ${
+      className={`absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer transition-all duration-700 ${
         isVisible ? "opacity-100 scale-100" : "opacity-0 scale-0"
-      } ${isActive ? "z-20" : "z-10"}`}
+      } ${isActive ? "z-30" : "z-20"}`}
       style={{
         left: `${((member.coordinates[1] + 180) / 360) * 100}%`,
         top: `${((90 - member.coordinates[0]) / 180) * 100}%`,
       }}
       onClick={onClick}
     >
-      <div className={`relative transition-all duration-300 ${isActive ? "scale-125" : "hover:scale-110"}`}>
-        {/* Pulsing ring animation */}
-        <div className="absolute inset-0 rounded-full bg-secondary animate-ping opacity-30"></div>
+      <div className={`relative transition-all duration-500 ${isActive ? "scale-150" : "hover:scale-125"}`}>
+        {/* Outer pulsing ring */}
+        <div
+          className="absolute inset-0 rounded-full animate-ping opacity-40"
+          style={{ backgroundColor: continentColor }}
+        ></div>
+
+        {/* Middle glow ring */}
+        <div
+          className="absolute inset-0 rounded-full opacity-60 blur-sm"
+          style={{
+            backgroundColor: continentColor,
+            boxShadow: `0 0 20px ${continentColor}`,
+            animation: "pulse 2s infinite",
+          }}
+        ></div>
 
         {/* Main marker */}
         <div
-          className={`w-6 h-6 rounded-full border-2 border-white shadow-lg transition-all duration-300 ${
-            isActive ? "bg-secondary scale-125" : "bg-blue-600 hover:bg-secondary"
+          className={`w-4 h-4 rounded-full border-2 border-white shadow-2xl transition-all duration-500 relative z-10 ${
+            isActive ? "scale-125" : ""
           }`}
+          style={{
+            backgroundColor: continentColor,
+            boxShadow: `0 0 15px ${continentColor}, inset 0 0 10px rgba(255,255,255,0.3)`,
+          }}
         >
-          <MapPin className="w-3 h-3 text-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
+          <div className="absolute inset-0 rounded-full bg-white opacity-30"></div>
         </div>
 
         {/* Flag indicator */}
-        <div className="absolute -top-1 -right-1 w-4 h-3 rounded-sm overflow-hidden border border-white shadow-sm">
-          <div className="w-full h-full bg-gradient-to-r from-blue-500 to-cyan-400 flex items-center justify-center">
+        <div className="absolute -top-2 -right-2 w-5 h-4 rounded-sm overflow-hidden border border-white shadow-lg backdrop-blur-sm bg-black/30">
+          <div className="w-full h-full flex items-center justify-center">
             <span className="text-xs">{member.flag}</span>
           </div>
         </div>
@@ -68,8 +86,9 @@ const MapMarker = ({ member, isActive, onClick, animationDelay }: MapMarkerProps
 
 export default function GlobalTeamMap() {
   const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null)
-  const [showTimeline, setShowTimeline] = useState(false)
+  const [showTimeline, setShowTimeline] = useState(true)
   const [currentYear, setCurrentYear] = useState(2025)
+  const [hoveredContinent, setHoveredContinent] = useState<string | null>(null)
 
   const teamMembers: TeamMember[] = [
     {
@@ -195,11 +214,19 @@ export default function GlobalTeamMap() {
   ]
 
   const continentColors = {
-    Europe: "from-blue-500 to-indigo-600",
-    Asia: "from-green-500 to-emerald-600",
-    Africa: "from-orange-500 to-red-600",
-    "Middle East": "from-purple-500 to-pink-600",
-    "North America": "from-yellow-500 to-orange-600",
+    Europe: "#8B5CF6", // Purple
+    Asia: "#10B981", // Green
+    Africa: "#F97316", // Orange
+    "Middle East": "#EC4899", // Magenta
+    "North America": "#F59E0B", // Yellow
+  }
+
+  const continentIcons = {
+    Europe: "🏛️",
+    Asia: "🏯",
+    Africa: "🦁",
+    "Middle East": "🕌",
+    "North America": "🗽",
   }
 
   const continentStats = teamMembers.reduce(
@@ -213,164 +240,174 @@ export default function GlobalTeamMap() {
   const filteredMembers = showTimeline ? teamMembers.filter((member) => member.joinedYear <= currentYear) : teamMembers
 
   return (
-    <section className="py-20 bg-digital-pattern text-white relative overflow-hidden">
+    <section
+      className="py-20 relative overflow-hidden"
+      style={{ background: "linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%)" }}
+    >
+      {/* Animated background particles */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-blue-400 rounded-full opacity-60 animate-pulse"></div>
+        <div className="absolute top-3/4 right-1/4 w-1 h-1 bg-purple-400 rounded-full opacity-40 animate-ping"></div>
+        <div className="absolute top-1/2 left-3/4 w-1.5 h-1.5 bg-cyan-400 rounded-full opacity-50 animate-pulse"></div>
+        <div className="absolute top-1/6 right-1/3 w-1 h-1 bg-pink-400 rounded-full opacity-30 animate-ping"></div>
+      </div>
+
       <div className="container mx-auto px-4 relative z-10">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold mb-4">OUR GLOBAL TEAM</h2>
-          <div className="w-20 h-1 bg-secondary mx-auto mb-6"></div>
-          <p className="text-gray-300 max-w-2xl mx-auto">
-            ALRI's strength lies in our diverse, international team of experts spanning across continents, bringing
-            together the best minds in quantitative finance from around the world.
+        <div className="text-center mb-12">
+          <h2 className="text-5xl font-bold mb-4 bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent">
+            GLOBAL TEAM NETWORK
+          </h2>
+          <div className="w-24 h-1 bg-gradient-to-r from-cyan-400 to-purple-600 mx-auto mb-6 rounded-full"></div>
+          <p className="text-gray-300 max-w-3xl mx-auto text-lg leading-relaxed">
+            Our distributed team of quantitative finance experts spans across continents, creating a 24/7 global network
+            of innovation and expertise in algorithmic trading and financial technology.
           </p>
         </div>
 
-        {/* Controls */}
-        <div className="flex justify-center mb-8">
-          <div className="bg-blue-900/30 backdrop-blur-sm rounded-lg p-4 border border-blue-700/30">
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => setShowTimeline(!showTimeline)}
-                className={`px-4 py-2 rounded-md transition-colors ${
-                  showTimeline ? "bg-secondary text-white" : "bg-blue-800/50 text-gray-300 hover:bg-blue-700/50"
-                }`}
-              >
-                {showTimeline ? "Hide Timeline" : "Show Timeline"}
-              </button>
+        {/* Futuristic Timeline Control */}
+        <div className="flex justify-center mb-12">
+          <div
+            className="bg-black/40 backdrop-blur-xl rounded-2xl p-6 border border-cyan-500/30 shadow-2xl"
+            style={{ boxShadow: "0 0 30px rgba(6, 182, 212, 0.2)" }}
+          >
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-3">
+                <Calendar className="w-6 h-6 text-cyan-400" />
+                <span className="text-cyan-400 font-semibold text-lg">Team Expansion Timeline</span>
+              </div>
 
-              {showTimeline && (
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-300">Year:</span>
+              <div className="flex items-center gap-4">
+                <span className="text-gray-300 text-sm font-medium">Year:</span>
+                <div className="relative">
                   <input
                     type="range"
                     min="2023"
                     max="2025"
                     value={currentYear}
                     onChange={(e) => setCurrentYear(Number.parseInt(e.target.value))}
-                    className="w-20"
+                    className="w-32 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                    style={{
+                      background: `linear-gradient(to right, #06b6d4 0%, #06b6d4 ${((currentYear - 2023) / 2) * 100}%, #374151 ${((currentYear - 2023) / 2) * 100}%, #374151 100%)`,
+                    }}
                   />
-                  <span className="text-sm font-bold text-secondary">{currentYear}</span>
                 </div>
-              )}
+                <div className="bg-gradient-to-r from-cyan-400 to-blue-500 text-black px-4 py-2 rounded-lg font-bold text-lg min-w-[60px] text-center">
+                  {currentYear}
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Realistic World Map Container */}
-        <div className="relative bg-blue-900/20 backdrop-blur-sm rounded-lg border border-blue-700/30 overflow-hidden mb-8">
-          <div className="relative w-full h-96 md:h-[500px]">
-            {/* Accurate World Map SVG with Real Geographic Data */}
+        {/* Futuristic World Map Container */}
+        <div
+          className="relative bg-black/20 backdrop-blur-xl rounded-3xl border border-cyan-500/20 overflow-hidden mb-12 shadow-2xl"
+          style={{ boxShadow: "0 0 50px rgba(6, 182, 212, 0.1)" }}
+        >
+          <div className="relative w-full h-[600px]">
+            {/* High-tech World Map SVG */}
             <svg viewBox="0 0 1000 500" className="w-full h-full">
               <defs>
                 <linearGradient id="oceanGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#1e3a8a" stopOpacity="0.4" />
-                  <stop offset="100%" stopColor="#0c4a6e" stopOpacity="0.7" />
+                  <stop offset="0%" stopColor="#0f0f23" stopOpacity="0.9" />
+                  <stop offset="50%" stopColor="#1a1a2e" stopOpacity="0.8" />
+                  <stop offset="100%" stopColor="#16213e" stopOpacity="0.9" />
                 </linearGradient>
                 <linearGradient id="landGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#374151" stopOpacity="0.8" />
-                  <stop offset="100%" stopColor="#1f2937" stopOpacity="0.9" />
+                  <stop offset="0%" stopColor="#2a2a3e" stopOpacity="0.6" />
+                  <stop offset="100%" stopColor="#1f1f35" stopOpacity="0.8" />
                 </linearGradient>
+                <filter id="glow">
+                  <feGaussianBlur stdDeviation="2" result="coloredBlur" />
+                  <feMerge>
+                    <feMergeNode in="coloredBlur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
               </defs>
 
               {/* Ocean background */}
               <rect width="1000" height="500" fill="url(#oceanGradient)" />
 
-              {/* Accurate World Map Paths - Based on Natural Earth Data */}
+              {/* Glowing grid pattern */}
+              <defs>
+                <pattern id="grid" width="50" height="25" patternUnits="userSpaceOnUse">
+                  <path d="M 50 0 L 0 0 0 25" fill="none" stroke="#06b6d4" strokeWidth="0.3" opacity="0.1" />
+                </pattern>
+              </defs>
+              <rect width="1000" height="500" fill="url(#grid)" />
+
+              {/* Stylized World Continents with Neon Outlines */}
 
               {/* North America */}
               <path
-                d="M158 110 C158 110 168 105 178 108 C188 111 198 115 208 120 C218 125 228 130 235 138 C242 146 246 156 248 166 C250 176 250 186 248 196 C246 206 242 216 235 224 C228 232 218 238 208 242 C198 246 188 248 178 248 C168 248 158 246 150 242 C142 238 136 232 132 224 C128 216 126 206 126 196 C126 186 128 176 132 168 C136 160 142 154 150 150 C158 146 158 110 158 110 Z"
+                d="M120 140 C140 130 160 135 180 145 C200 155 220 170 230 190 C235 210 230 230 220 245 C200 255 180 250 160 245 C140 240 125 225 120 205 C115 185 115 165 120 140 Z"
                 fill="url(#landGradient)"
-                stroke="#4b5563"
-                strokeWidth="0.5"
+                stroke="#06b6d4"
+                strokeWidth="1.5"
+                filter="url(#glow)"
+                opacity="0.8"
               />
 
               {/* South America */}
               <path
-                d="M220 250 C220 250 225 245 232 248 C239 251 246 256 251 263 C256 270 259 279 260 288 C261 297 260 306 257 315 C254 324 249 332 242 338 C235 344 226 348 217 350 C208 352 199 352 191 350 C183 348 176 344 171 338 C166 332 163 324 162 315 C161 306 162 297 165 288 C168 279 173 270 180 263 C187 256 196 251 206 248 C216 245 220 250 220 250 Z"
+                d="M200 280 C215 270 230 275 240 290 C250 305 245 325 240 345 C235 365 225 380 210 385 C195 390 180 385 175 370 C170 355 175 340 180 325 C185 310 190 295 200 280 Z"
                 fill="url(#landGradient)"
-                stroke="#4b5563"
-                strokeWidth="0.5"
+                stroke="#06b6d4"
+                strokeWidth="1.5"
+                filter="url(#glow)"
+                opacity="0.8"
               />
 
               {/* Europe */}
               <path
-                d="M480 140 C480 140 485 135 492 137 C499 139 506 143 512 148 C518 153 523 159 526 166 C529 173 530 181 529 189 C528 197 525 204 520 210 C515 216 508 220 500 222 C492 224 483 224 475 222 C467 220 460 216 455 210 C450 204 447 197 446 189 C445 181 446 173 449 166 C452 159 457 153 463 148 C469 143 476 139 480 140 Z"
+                d="M480 160 C495 155 510 160 520 170 C530 180 525 195 520 205 C515 215 505 220 495 218 C485 216 475 210 470 200 C465 190 470 180 475 170 C480 165 480 160 480 160 Z"
                 fill="url(#landGradient)"
-                stroke="#4b5563"
-                strokeWidth="0.5"
+                stroke="#8B5CF6"
+                strokeWidth="2"
+                filter="url(#glow)"
+                opacity="0.9"
               />
 
               {/* Africa */}
               <path
-                d="M500 200 C500 200 510 195 520 200 C530 205 538 213 544 222 C550 231 554 241 556 252 C558 263 558 274 556 285 C554 296 550 306 544 315 C538 324 530 331 520 336 C510 341 499 344 488 345 C477 346 466 345 456 342 C446 339 437 334 430 327 C423 320 418 311 415 301 C412 291 411 280 412 269 C413 258 416 247 421 237 C426 227 433 218 442 211 C451 204 462 199 473 197 C484 195 495 196 500 200 Z"
+                d="M500 230 C520 225 540 235 550 255 C560 275 555 300 545 320 C535 340 520 350 505 345 C490 340 480 325 475 305 C470 285 475 265 485 250 C495 235 500 230 500 230 Z"
                 fill="url(#landGradient)"
-                stroke="#4b5563"
-                strokeWidth="0.5"
+                stroke="#F97316"
+                strokeWidth="2"
+                filter="url(#glow)"
+                opacity="0.9"
               />
 
               {/* Asia */}
               <path
-                d="M580 120 C580 120 600 115 620 118 C640 121 660 126 678 134 C696 142 712 153 726 166 C740 179 752 194 761 210 C770 226 776 243 779 261 C782 279 782 297 779 315 C776 333 770 350 761 366 C752 382 740 397 726 410 C712 423 696 434 678 442 C660 450 640 455 620 458 C600 461 580 462 560 461 C540 460 520 457 502 452 C484 447 468 440 454 431 C440 422 428 411 419 398 C410 385 404 370 401 354 C398 338 398 321 401 305 C404 289 410 274 419 260 C428 246 440 233 454 222 C468 211 484 202 502 196 C520 190 540 187 560 187 C580 187 580 120 580 120 Z"
+                d="M580 140 C620 135 660 145 700 160 C740 175 770 195 780 220 C785 245 775 270 760 285 C745 300 725 305 705 300 C685 295 665 285 650 270 C635 255 625 235 620 215 C615 195 615 175 620 155 C625 145 580 140 580 140 Z"
                 fill="url(#landGradient)"
-                stroke="#4b5563"
-                strokeWidth="0.5"
+                stroke="#10B981"
+                strokeWidth="2"
+                filter="url(#glow)"
+                opacity="0.9"
               />
 
               {/* Australia */}
               <path
-                d="M750 350 C750 350 760 345 770 348 C780 351 789 356 796 363 C803 370 808 378 811 387 C814 396 815 406 814 415 C813 424 810 433 805 441 C800 449 793 456 785 461 C777 466 768 469 759 470 C750 471 741 470 732 467 C723 464 715 459 708 452 C701 445 696 437 693 428 C690 419 689 409 690 399 C691 389 694 380 699 372 C704 364 711 357 719 352 C727 347 736 344 745 343 C754 342 750 350 750 350 Z"
+                d="M750 370 C770 365 790 370 800 385 C810 400 805 415 795 425 C785 435 770 435 755 430 C740 425 730 415 735 400 C740 385 750 370 750 370 Z"
                 fill="url(#landGradient)"
-                stroke="#4b5563"
-                strokeWidth="0.5"
+                stroke="#06b6d4"
+                strokeWidth="1.5"
+                filter="url(#glow)"
+                opacity="0.8"
               />
 
-              {/* Greenland */}
+              {/* Middle East region highlight */}
               <path
-                d="M350 80 C350 80 360 75 370 78 C380 81 388 87 394 95 C400 103 404 112 406 122 C408 132 408 142 406 152 C404 162 400 171 394 179 C388 187 380 193 370 197 C360 201 349 203 338 203 C327 203 316 201 306 197 C296 193 288 187 282 179 C276 171 272 162 270 152 C268 142 268 132 270 122 C272 112 276 103 282 95 C288 87 296 81 306 78 C316 75 327 75 338 78 C349 81 350 80 350 80 Z"
+                d="M520 200 C535 195 550 200 560 210 C570 220 565 235 555 240 C545 245 535 240 525 235 C515 230 515 220 520 210 C520 205 520 200 520 200 Z"
                 fill="url(#landGradient)"
-                stroke="#4b5563"
-                strokeWidth="0.5"
+                stroke="#EC4899"
+                strokeWidth="2"
+                filter="url(#glow)"
+                opacity="0.9"
               />
-
-              {/* Japan */}
-              <path
-                d="M820 180 C820 180 825 175 830 178 C835 181 839 186 841 192 C843 198 843 205 841 211 C839 217 835 222 830 225 C825 228 819 229 813 228 C807 227 801 224 797 219 C793 214 791 208 791 201 C791 194 793 187 797 181 C801 175 807 171 813 169 C819 167 820 180 820 180 Z"
-                fill="url(#landGradient)"
-                stroke="#4b5563"
-                strokeWidth="0.5"
-              />
-
-              {/* United Kingdom */}
-              <path
-                d="M460 130 C460 130 463 127 467 128 C471 129 474 132 476 136 C478 140 478 145 476 149 C474 153 471 156 467 158 C463 160 458 160 454 158 C450 156 447 153 445 149 C443 145 443 140 445 136 C447 132 450 129 454 128 C458 127 460 130 460 130 Z"
-                fill="url(#landGradient)"
-                stroke="#4b5563"
-                strokeWidth="0.5"
-              />
-
-              {/* Madagascar */}
-              <path
-                d="M560 320 C560 320 563 317 567 318 C571 319 574 322 576 326 C578 330 578 335 576 339 C574 343 571 346 567 348 C563 350 558 350 554 348 C550 346 547 343 545 339 C543 335 543 330 545 326 C547 322 550 319 554 318 C558 317 560 320 560 320 Z"
-                fill="url(#landGradient)"
-                stroke="#4b5563"
-                strokeWidth="0.5"
-              />
-
-              {/* New Zealand */}
-              <path
-                d="M850 380 C850 380 853 377 857 378 C861 379 864 382 866 386 C868 390 868 395 866 399 C864 403 861 406 857 408 C853 410 848 410 844 408 C840 406 837 403 835 399 C833 395 833 390 835 386 C837 382 840 379 844 378 C848 377 850 380 850 380 Z"
-                fill="url(#landGradient)"
-                stroke="#4b5563"
-                strokeWidth="0.5"
-              />
-
-              {/* Grid overlay for coordinates */}
-              <defs>
-                <pattern id="grid" width="100" height="50" patternUnits="userSpaceOnUse">
-                  <path d="M 100 0 L 0 0 0 50" fill="none" stroke="#1e40af" strokeWidth="0.2" opacity="0.2" />
-                </pattern>
-              </defs>
-              <rect width="1000" height="500" fill="url(#grid)" />
             </svg>
 
             {/* Team Member Markers */}
@@ -380,11 +417,12 @@ export default function GlobalTeamMap() {
                 member={member}
                 isActive={selectedMember?.id === member.id}
                 onClick={() => setSelectedMember(selectedMember?.id === member.id ? null : member)}
-                animationDelay={index * 200}
+                animationDelay={index * 300}
+                continentColor={continentColors[member.continent]}
               />
             ))}
 
-            {/* Connection Lines */}
+            {/* Network Connection Lines */}
             <svg className="absolute inset-0 w-full h-full pointer-events-none">
               {filteredMembers.map((member, index) => {
                 if (index === 0) return null
@@ -396,40 +434,78 @@ export default function GlobalTeamMap() {
                     y1={`${((90 - prevMember.coordinates[0]) / 180) * 100}%`}
                     x2={`${((member.coordinates[1] + 180) / 360) * 100}%`}
                     y2={`${((90 - member.coordinates[0]) / 180) * 100}%`}
-                    stroke="rgba(34, 211, 238, 0.3)"
+                    stroke="rgba(6, 182, 212, 0.4)"
                     strokeWidth="1"
-                    strokeDasharray="5,5"
+                    strokeDasharray="8,4"
                     className="animate-pulse"
+                    style={{ filter: "drop-shadow(0 0 3px rgba(6, 182, 212, 0.6))" }}
                   />
                 )
               })}
+            </svg>
+
+            {/* Central hub connections */}
+            <svg className="absolute inset-0 w-full h-full pointer-events-none">
+              {filteredMembers.map((member) => (
+                <line
+                  key={`hub-${member.id}`}
+                  x1="50%"
+                  y1="50%"
+                  x2={`${((member.coordinates[1] + 180) / 360) * 100}%`}
+                  y2={`${((90 - member.coordinates[0]) / 180) * 100}%`}
+                  stroke={continentColors[member.continent]}
+                  strokeWidth="0.5"
+                  strokeDasharray="4,8"
+                  opacity="0.3"
+                  className="animate-pulse"
+                />
+              ))}
             </svg>
           </div>
 
           {/* Selected Member Info Panel */}
           {selectedMember && (
-            <div className="absolute bottom-4 left-4 right-4 bg-blue-900/90 backdrop-blur-sm rounded-lg p-4 border border-blue-700/50 animate-fade-in">
-              <div className="flex items-start gap-4">
+            <div
+              className="absolute bottom-6 left-6 right-6 bg-black/60 backdrop-blur-xl rounded-2xl p-6 border border-cyan-500/30 shadow-2xl animate-fade-in"
+              style={{ boxShadow: "0 0 30px rgba(6, 182, 212, 0.2)" }}
+            >
+              <div className="flex items-start gap-6">
                 <div className="flex-shrink-0">
-                  <div className="w-12 h-12 bg-secondary rounded-full flex items-center justify-center">
-                    <Users className="w-6 h-6 text-white" />
+                  <div
+                    className="w-16 h-16 rounded-full flex items-center justify-center relative"
+                    style={{ backgroundColor: continentColors[selectedMember.continent] }}
+                  >
+                    <Users className="w-8 h-8 text-white" />
+                    <div
+                      className="absolute inset-0 rounded-full animate-ping opacity-30"
+                      style={{ backgroundColor: continentColors[selectedMember.continent] }}
+                    ></div>
                   </div>
                 </div>
                 <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h3 className="text-lg font-bold text-white">{selectedMember.name}</h3>
-                    <span className="text-lg">{selectedMember.flag}</span>
+                  <div className="flex items-center gap-3 mb-2">
+                    <h3 className="text-2xl font-bold text-white">{selectedMember.name}</h3>
+                    <span className="text-2xl">{selectedMember.flag}</span>
+                    <div
+                      className="px-3 py-1 rounded-full text-xs font-semibold"
+                      style={{
+                        backgroundColor: `${continentColors[selectedMember.continent]}20`,
+                        color: continentColors[selectedMember.continent],
+                      }}
+                    >
+                      {selectedMember.continent}
+                    </div>
                   </div>
-                  <p className="text-secondary text-sm font-medium mb-1">{selectedMember.role}</p>
-                  <p className="text-gray-300 text-sm mb-2">
-                    <MapPin className="w-3 h-3 inline mr-1" />
+                  <p className="text-cyan-400 text-lg font-medium mb-2">{selectedMember.role}</p>
+                  <p className="text-gray-300 mb-3 flex items-center gap-2">
+                    <MapPin className="w-4 h-4 text-cyan-400" />
                     {selectedMember.location}
                   </p>
-                  <p className="text-gray-300 text-sm">{selectedMember.bio}</p>
+                  <p className="text-gray-300 leading-relaxed">{selectedMember.bio}</p>
                 </div>
                 <button
                   onClick={() => setSelectedMember(null)}
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-gray-400 hover:text-white transition-colors text-2xl font-bold"
                 >
                   ×
                 </button>
@@ -438,60 +514,102 @@ export default function GlobalTeamMap() {
           )}
         </div>
 
-        {/* Statistics */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+        {/* Modern Glass-morphism Statistics Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           {Object.entries(continentStats).map(([continent, count]) => (
             <div
               key={continent}
-              className="bg-blue-900/30 backdrop-blur-sm rounded-lg p-4 border border-blue-700/30 text-center"
+              className="relative group cursor-pointer transition-all duration-500 hover:scale-105"
+              onMouseEnter={() => setHoveredContinent(continent)}
+              onMouseLeave={() => setHoveredContinent(null)}
             >
-              <div className={`w-8 h-8 rounded-full bg-gradient-to-r ${continentColors[continent]} mx-auto mb-2`}></div>
-              <h3 className="text-lg font-bold text-white">{count}</h3>
-              <p className="text-xs text-gray-300">{continent}</p>
+              <div
+                className="bg-black/30 backdrop-blur-xl rounded-2xl p-6 border border-gray-700/30 shadow-2xl relative overflow-hidden"
+                style={{
+                  borderColor: hoveredContinent === continent ? continentColors[continent] : "rgba(55, 65, 81, 0.3)",
+                  boxShadow:
+                    hoveredContinent === continent
+                      ? `0 0 30px ${continentColors[continent]}40`
+                      : "0 10px 25px rgba(0,0,0,0.3)",
+                }}
+              >
+                {/* Background glow effect */}
+                <div
+                  className="absolute inset-0 opacity-10 rounded-2xl"
+                  style={{ backgroundColor: continentColors[continent] }}
+                ></div>
+
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between mb-4">
+                    <div
+                      className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl"
+                      style={{ backgroundColor: `${continentColors[continent]}20` }}
+                    >
+                      {continentIcons[continent]}
+                    </div>
+                    <Network className="w-6 h-6 text-gray-400" />
+                  </div>
+
+                  <div className="text-4xl font-bold mb-2" style={{ color: continentColors[continent] }}>
+                    {count}
+                  </div>
+
+                  <div className="text-gray-300 font-medium text-lg mb-1">{continent}</div>
+
+                  <div className="text-gray-500 text-sm">Team {count === 1 ? "Member" : "Members"}</div>
+
+                  {/* Progress bar */}
+                  <div className="mt-4 h-1 bg-gray-700 rounded-full overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all duration-1000"
+                      style={{
+                        backgroundColor: continentColors[continent],
+                        width: `${(count / Math.max(...Object.values(continentStats))) * 100}%`,
+                      }}
+                    ></div>
+                  </div>
+                </div>
+              </div>
             </div>
           ))}
         </div>
 
-        {/* Team Expansion Timeline */}
-        {showTimeline && (
-          <div className="bg-blue-900/30 backdrop-blur-sm rounded-lg p-6 border border-blue-700/30">
-            <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-              <Globe className="w-5 h-5" />
-              Team Expansion Timeline
-            </h3>
-            <div className="space-y-2">
-              {[2023, 2024, 2025].map((year) => (
-                <div key={year} className="flex items-center gap-4">
-                  <div className={`w-3 h-3 rounded-full ${year <= currentYear ? "bg-secondary" : "bg-gray-600"}`}></div>
-                  <span className={`font-medium ${year <= currentYear ? "text-white" : "text-gray-500"}`}>{year}</span>
-                  <div className="flex gap-2 flex-wrap">
-                    {teamMembers
-                      .filter((member) => member.joinedYear === year)
-                      .map((member) => (
-                        <span
-                          key={member.id}
-                          className={`text-xs px-2 py-1 rounded-full ${
-                            year <= currentYear ? "bg-secondary/20 text-secondary" : "bg-gray-700 text-gray-400"
-                          }`}
-                        >
-                          {member.name} ({member.country})
-                        </span>
-                      ))}
-                  </div>
-                </div>
-              ))}
-            </div>
+        {/* Network Status Indicator */}
+        <div className="mt-12 text-center">
+          <div className="inline-flex items-center gap-3 bg-black/40 backdrop-blur-xl rounded-full px-6 py-3 border border-green-500/30">
+            <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+            <span className="text-green-400 font-semibold">Global Network Active</span>
+            <span className="text-gray-400">•</span>
+            <span className="text-gray-300">{filteredMembers.length} Nodes Connected</span>
           </div>
-        )}
+        </div>
       </div>
 
       <style jsx>{`
         @keyframes fade-in {
-          from { opacity: 0; transform: translateY(10px); }
+          from { opacity: 0; transform: translateY(20px); }
           to { opacity: 1; transform: translateY(0); }
         }
         .animate-fade-in {
-          animation: fade-in 0.3s ease-in-out;
+          animation: fade-in 0.5s ease-out;
+        }
+        .slider::-webkit-slider-thumb {
+          appearance: none;
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          background: linear-gradient(45deg, #06b6d4, #3b82f6);
+          cursor: pointer;
+          box-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
+        }
+        .slider::-moz-range-thumb {
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          background: linear-gradient(45deg, #06b6d4, #3b82f6);
+          cursor: pointer;
+          border: none;
+          box-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
         }
       `}</style>
     </section>
